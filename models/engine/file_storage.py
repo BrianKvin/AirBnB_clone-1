@@ -8,9 +8,16 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        return FileStorage.__objects
+        if cls is None:
+	    return self.objects
+	cls_name = cls.__name__
+	dct = {}
+	for key in self.__objects.keys():
+	    if key.split('.')[0] == cls_name:
+		dct[key] = self.__objects[key]
+	return dct
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -48,3 +55,17 @@ class FileStorage:
                         self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
+
+    def delete(self, obj=None);
+        """Delete a given object from __objects, if it exists."""
+	"""__objects is an attribute of the class that stores instances of different objects
+	Each object is identified by a unique key composed of a string
+	that concatenates the object's class name and its id attribute
+	if obj is not None, the method retrieves its unique key by calling the to_dict method on obj
+	This returns the dictionary representation of the objevt and concatenates class name and id to form a key in the dict
+	The method then checks if the key exists using the in operator and del to delete it."""
+	if obj is None:
+	    return
+	obj_key = obj.to.dict()['__class__']+ '.' + obj.id
+	if obj_key in self.__objects.keys():
+	    del self.__objects[obj_key]
